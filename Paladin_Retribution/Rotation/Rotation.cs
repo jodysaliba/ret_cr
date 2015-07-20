@@ -72,7 +72,9 @@ namespace Paladin_Retribution.Rotation
                 //actions+=/berserking
                 //actions+=/arcane_torrent
                 //actions+=/seraphim
-                S.blindCast(SB.s_Seraphim, ret => TM.t_Seraphim)
+                S.blindCast(SB.s_Seraphim, ret => TM.t_Seraphim),
+                S.Buff(SB.s_SealOfTruth, ret => !HkM.righteousness && !U.sealOfTruth),
+                S.Buff(SB.s_SealOfRighteousness, ret => HkM.righteousness && !U.sealOfRighteousness)
                 );
         } 
         #endregion
@@ -81,8 +83,9 @@ namespace Paladin_Retribution.Rotation
         public static Composite preCombatBuffing()
         {
             return new PrioritySelector(
-                new Decorator(ret => HkM.manualOn || !Me.IsAlive || Me.IsCasting || Me.IsChanneling || Me.Mounted || Me.OnTaxi, new ActionAlwaysSucceed())
-                //S.blindCast(SB.s_SealOfTruth, ret => !U.auraExists(Me, SB.s_SealOfTruth, true))
+                new Decorator(ret => HkM.manualOn || !Me.IsAlive || Me.IsCasting || Me.IsChanneling || Me.Mounted || Me.OnTaxi, new ActionAlwaysSucceed()),
+                S.Buff(SB.s_SealOfTruth, ret => !HkM.righteousness && !U.sealOfTruth),
+                S.Buff(SB.s_SealOfRighteousness, ret => HkM.righteousness && !U.sealOfRighteousness)
                 );
         }  
         #endregion
@@ -117,13 +120,13 @@ namespace Paladin_Retribution.Rotation
                                 //actions.cleave+=/divine_storm,if=holy_power=5&buff.final_verdict.up
                                 S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.holyPower == 5 && U.finalVerdict)),
                                 //actions.cleave+=/divine_storm,if=buff.divine_crusader.react&holy_power=5&!talent.final_verdict.enabled
-                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.divineCrusader && U.holyPower == 5 && !TM.t_FinalVerdict)),
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && (U.divineCrusader && U.holyPower == 5 && !TM.t_FinalVerdict)),
                                 //actions.cleave+=/divine_storm,if=holy_power=5&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*4)&!talent.final_verdict.enabled
                                 S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.holyPower == 5 && (!TM.t_Seraphim || U.cd_seraphim_remains > 5000) && !TM.t_FinalVerdict)),
                                 //actions.cleave+=/hammer_of_wrath
                                 S.Cast(SB.s_HammerOfWrath, ret => U.isUnitValid(currentTarget, SB.s_HammerOfWrath)),
                                 //actions.cleave+=/hammer_of_the_righteous,if=t18_class_trinket=1&buff.focus_of_vengeance.remains<gcd.max*2
-                                S.Cast(SB.s_HammerOfWrath, ret => U.isUnitValid(currentTarget, SB.s_HammerOfWrath) && (t18_trinket && U.focusOfVengeance_remains < 3500)),
+                                S.Cast(SB.s_HammerOfTheRighteous, ret => U.isUnitValid(currentTarget, SB.s_HammerOfTheRighteous) && (t18_trinket && U.focusOfVengeance_remains < 3000)),
                                 //actions.cleave+=/judgment,if=talent.empowered_seals.enabled&seal.righteousness&buff.liadrins_righteousness.remains<cooldown.judgment.duration
                                 S.Cast(SB.s_Judgement, ret => U.isUnitValid(currentTarget, SB.s_Judgement) && (TM.t_EmpoweredSeals && U.sealOfRighteousness && U.liadrinsRighteousness_remains < 5000)),
                                 //actions.cleave+=/exorcism,if=buff.blazing_contempt.up&holy_power<=2&buff.holy_avenger.down
@@ -143,11 +146,9 @@ namespace Paladin_Retribution.Rotation
                                 //actions.cleave+=/divine_storm,if=holy_power=3&(buff.avenging_wrath.up|target.health.pct<35)&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*5)&!talent.final_verdict.enabled
                                 S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.holyPower == 3 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains < 5000) && !TM.t_FinalVerdict)),
                                 //actions.cleave+=/hammer_of_the_righteous,if=spell_targets.hammer_of_the_righteous>=4&talent.seraphim.enabled
-                                    S.Cast(SB.s_HammerOfTheRighteous, ret => U.isUnitValid(currentTarget, SB.s_HammerOfTheRighteous) && (enemies >= 4 && TM.t_Seraphim)),
-                                    //S.Cast(SB.s_HammerOfTheRighteous, ret => U.isUnitValid(currentTarget, SB.s_HammerOfTheRighteous) && (TM.t_Seraphim)),
+                                S.Cast(SB.s_HammerOfTheRighteous, ret => U.isUnitValid(currentTarget, SB.s_HammerOfTheRighteous) && (enemies >= 4 && TM.t_Seraphim)),
                                 //actions.cleave+=/hammer_of_the_righteous,,if=spell_targets.hammer_of_the_righteous>=4&(holy_power<=3|(holy_power=4&target.health.pct>=35&buff.avenging_wrath.down))
-                                    S.Cast(SB.s_HammerOfTheRighteous, ret => U.isUnitValid(currentTarget, SB.s_HammerOfTheRighteous) && (enemies >= 4 && (U.holyPower <= 3 || (U.holyPower == 4 && currentTarget.HealthPercent >= 35 && !U.avengingWrath)))),
-                                    //S.Cast(SB.s_HammerOfTheRighteous, ret => U.isUnitValid(currentTarget, SB.s_HammerOfTheRighteous) && ((U.holyPower <= 3 || (U.holyPower == 4 && currentTarget.HealthPercent >= 35 && !U.avengingWrath)))),
+                                S.Cast(SB.s_HammerOfTheRighteous, ret => U.isUnitValid(currentTarget, SB.s_HammerOfTheRighteous) && (enemies >= 4 && (U.holyPower <= 3 || (U.holyPower == 4 && currentTarget.HealthPercent >= 35 && !U.avengingWrath)))),
                                 //actions.cleave+=/crusader_strike,if=talent.seraphim.enabled
                                 S.Cast(SB.s_CrusaderStrike, ret => U.isUnitValid(currentTarget, SB.s_CrusaderStrike) && (TM.t_Seraphim)),
                                 //actions.cleave+=/crusader_strike,if=holy_power<=3|(holy_power=4&target.health.pct>=35&buff.avenging_wrath.down)
@@ -206,7 +207,7 @@ namespace Paladin_Retribution.Rotation
                             //actions.single+=/final_verdict,if=buff.divine_purpose.react&buff.divine_purpose.remains<3
                             S.Cast(SB.s_FinalVerdict, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && TM.t_FinalVerdict && (U.divinePurpose && U.divinePurpose_remains < 3000)),
                             //actions.single+=/crusader_strike,if=t18_class_trinket=1&buff.focus_of_vengeance.remains<gcd.max*2
-                            S.Cast(SB.s_CrusaderStrike, ret => U.isUnitValid(currentTarget, SB.s_CrusaderStrike) && (t18_trinket && U.focusOfVengeance_remains < 2500)),
+                            S.Cast(SB.s_CrusaderStrike, ret => U.isUnitValid(currentTarget, SB.s_CrusaderStrike) && (t18_trinket && U.focusOfVengeance_remains < 3000)),
                             //actions.single+=/hammer_of_wrath
                             S.Cast(SB.s_HammerOfWrath, ret => U.isUnitValid(currentTarget, SB.s_HammerOfWrath)),
                             //actions.single+=/exorcism,if=buff.blazing_contempt.up&holy_power<=2&buff.holy_avenger.down
@@ -220,11 +221,11 @@ namespace Paladin_Retribution.Rotation
                             //actions.single+=/divine_storm,if=buff.divine_crusader.react&spell_targets.divine_storm=2&(buff.avenging_wrath.up|target.health.pct<35)&!talent.final_verdict.enabled
                             S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.divineCrusader && enemies == 2 && (U.avengingWrath || currentTarget.HealthPercent < 35) && !TM.t_FinalVerdict)),
                             //actions.single+=/templars_verdict,if=holy_power=5&(buff.avenging_wrath.up|target.health.pct<35)&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*3)
-                            S.Cast(SB.s_TemplarsVerdict, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && !TM.t_FinalVerdict && (U.holyPower == 5 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains < 3000))),
+                            S.Cast(SB.s_TemplarsVerdict, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && !TM.t_FinalVerdict && (U.holyPower == 5 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains > 3000))),
                             //actions.single+=/templars_verdict,if=holy_power=4&(buff.avenging_wrath.up|target.health.pct<35)&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*4)
-                            S.Cast(SB.s_TemplarsVerdict, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && !TM.t_FinalVerdict && (U.holyPower == 4 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains < 4000))),
+                            S.Cast(SB.s_TemplarsVerdict, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && !TM.t_FinalVerdict && (U.holyPower == 4 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains > 4000))),
                             //actions.single+=/templars_verdict,if=holy_power=3&(buff.avenging_wrath.up|target.health.pct<35)&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*5)
-                            S.Cast(SB.s_TemplarsVerdict, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && !TM.t_FinalVerdict && (U.holyPower == 3 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains < 5000))),
+                            S.Cast(SB.s_TemplarsVerdict, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && !TM.t_FinalVerdict && (U.holyPower == 3 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains > 5000))),
                             //actions.single+=/judgment,if=talent.empowered_seals.enabled&seal.truth&buff.maraads_truth.remains<cooldown.judgment.duration*1.5
                             S.Cast(SB.s_Judgement, ret => U.isUnitValid(currentTarget, SB.s_Judgement) && (TM.t_EmpoweredSeals && U.sealOfTruth && U.maraadsTruth_remains < 7500)),
                             //actions.single+=/judgment,if=talent.empowered_seals.enabled&seal.righteousness&buff.liadrins_righteousness.remains<cooldown.judgment.duration*1.5
@@ -286,42 +287,76 @@ namespace Paladin_Retribution.Rotation
                             new Decorator(ret => HkM.aoeOn && enemies >= 3, new PrioritySelector(
                                 // 3+ TARGETS //
                                 //actions.cleave=final_verdict,if=buff.final_verdict.down&holy_power=5
+                                S.Cast(SB.s_FinalVerdict, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (!U.finalVerdict && U.holyPower == 5)),
                                 //actions.cleave+=/divine_storm,if=buff.divine_crusader.react&holy_power=5&buff.final_verdict.up
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.divineCrusader && U.holyPower == 5 && U.finalVerdict)),
                                 //actions.cleave+=/divine_storm,if=holy_power=5&buff.final_verdict.up
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.holyPower == 5 && U.finalVerdict)),
                                 //actions.cleave+=/divine_storm,if=buff.divine_crusader.react&holy_power=5&!talent.final_verdict.enabled
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && (U.divineCrusader && U.holyPower == 5 && !TM.t_FinalVerdict)),
                                 //actions.cleave+=/divine_storm,if=holy_power=5&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*4)&!talent.final_verdict.enabled
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && (U.holyPower == 5 && (!TM.t_Seraphim || U.cd_seraphim_remains > 5000) && !TM.t_FinalVerdict)),
                                 //actions.cleave+=/hammer_of_wrath
+                                S.Cast(SB.s_HammerOfWrath, ret => U.isUnitValid(currentTarget, SB.s_HammerOfWrath)),
                                 //actions.cleave+=/hammer_of_the_righteous,if=t18_class_trinket=1&buff.focus_of_vengeance.remains<gcd.max*2
+                                S.Cast(SB.s_HammerOfTheRighteous, ret => U.isUnitValid(currentTarget, SB.s_HammerOfTheRighteous) && (t18_trinket && U.focusOfVengeance_remains < 3000)),
                                 //actions.cleave+=/judgment,if=talent.empowered_seals.enabled&seal.righteousness&buff.liadrins_righteousness.remains<cooldown.judgment.duration
+                                S.Cast(SB.s_Judgement, ret => U.isUnitValid(currentTarget, SB.s_Judgement) && (TM.t_EmpoweredSeals && U.sealOfRighteousness && U.liadrinsRighteousness_remains < 5000)),
                                 //actions.cleave+=/exorcism,if=buff.blazing_contempt.up&holy_power<=2&buff.holy_avenger.down
+                                S.Cast(SB.s_Exorcism, ret => U.isUnitValid(currentTarget, SB.s_Exorcism) && (U.blazingContempt && U.holyPower <= 2 && !U.holyAvenger)),
                                 //actions.cleave+=/divine_storm,if=buff.divine_crusader.react&buff.final_verdict.up&(buff.avenging_wrath.up|target.health.pct<35)
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.divineCrusader && U.finalVerdict && (U.avengingWrath || currentTarget.HealthPercent < 35))),
                                 //actions.cleave+=/divine_storm,if=buff.final_verdict.up&(buff.avenging_wrath.up|target.health.pct<35)
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.finalVerdict && (U.avengingWrath || currentTarget.HealthPercent < 35))),
                                 //actions.cleave+=/final_verdict,if=buff.final_verdict.down&(buff.avenging_wrath.up|target.health.pct<35)
+                                S.Cast(SB.s_FinalVerdict, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (!U.finalVerdict && (U.avengingWrath || currentTarget.HealthPercent < 35))),
                                 //actions.cleave+=/divine_storm,if=buff.divine_crusader.react&(buff.avenging_wrath.up|target.health.pct<35)&!talent.final_verdict.enabled
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && (U.divineCrusader && (U.avengingWrath || currentTarget.HealthPercent < 35) && !TM.t_FinalVerdict)),
                                 //actions.cleave+=/divine_storm,if=holy_power=5&(buff.avenging_wrath.up|target.health.pct<35)&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*3)&!talent.final_verdict.enabled
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && (U.holyPower == 5 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains < 3000) && !TM.t_FinalVerdict)),
                                 //actions.cleave+=/divine_storm,if=holy_power=4&(buff.avenging_wrath.up|target.health.pct<35)&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*4)&!talent.final_verdict.enabled
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && (U.holyPower == 4 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains < 4000) && !TM.t_FinalVerdict)),
                                 //actions.cleave+=/divine_storm,if=holy_power=3&(buff.avenging_wrath.up|target.health.pct<35)&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*5)&!talent.final_verdict.enabled
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && (U.holyPower == 3 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains < 5000) && !TM.t_FinalVerdict)),
                                 //actions.cleave+=/hammer_of_the_righteous,if=spell_targets.hammer_of_the_righteous>=4&talent.seraphim.enabled
+                                S.Cast(SB.s_HammerOfTheRighteous, ret => U.isUnitValid(currentTarget, SB.s_HammerOfTheRighteous) && (enemies >= 4 && TM.t_Seraphim)),
                                 //actions.cleave+=/hammer_of_the_righteous,,if=spell_targets.hammer_of_the_righteous>=4&(holy_power<=3|(holy_power=4&target.health.pct>=35&buff.avenging_wrath.down))
+                                S.Cast(SB.s_HammerOfTheRighteous, ret => U.isUnitValid(currentTarget, SB.s_HammerOfTheRighteous) && (enemies >= 4 && (U.holyPower <= 3 || (U.holyPower == 4 && currentTarget.HealthPercent >= 35 && !U.avengingWrath)))),
                                 //actions.cleave+=/crusader_strike,if=talent.seraphim.enabled
+                                S.Cast(SB.s_CrusaderStrike, ret => U.isUnitValid(currentTarget, SB.s_CrusaderStrike) && (TM.t_Seraphim)),
                                 //actions.cleave+=/crusader_strike,if=holy_power<=3|(holy_power=4&target.health.pct>=35&buff.avenging_wrath.down)
-                                //actions.cleave+=/exorcism,if=glyph.mass_exorcism.enabled&!set_bonus.tier17_4pc=1
-                                //actions.cleave+=/judgment,cycle_targets=1,if=last_judgment_target!=target&talent.seraphim.enabled&glyph.double_jeopardy.enabled
+                                S.Cast(SB.s_CrusaderStrike, ret => U.isUnitValid(currentTarget, SB.s_CrusaderStrike) && (U.holyPower <= 3 || (U.holyPower == 4 && currentTarget.HealthPercent >= 35 && !U.avengingWrath))),
+                                    //actions.cleave+=/exorcism,if=glyph.mass_exorcism.enabled&!set_bonus.tier17_4pc=1
+                                    //actions.cleave+=/judgment,cycle_targets=1,if=last_judgment_target!=target&talent.seraphim.enabled&glyph.double_jeopardy.enabled
                                 //actions.cleave+=/judgment,if=talent.seraphim.enabled
-                                //actions.cleave+=/judgment,cycle_targets=1,if=last_judgment_target!=target&glyph.double_jeopardy.enabled&(holy_power<=3|(holy_power=4&cooldown.crusader_strike.remains>=gcd*2&target.health.pct>35&buff.avenging_wrath.down))
+                                S.Cast(SB.s_Judgement, ret => U.isUnitValid(currentTarget, SB.s_Judgement) && (TM.t_Seraphim)),
+                                    //actions.cleave+=/judgment,cycle_targets=1,if=last_judgment_target!=target&glyph.double_jeopardy.enabled&(holy_power<=3|(holy_power=4&cooldown.crusader_strike.remains>=gcd*2&target.health.pct>35&buff.avenging_wrath.down))
                                 //actions.cleave+=/judgment,if=holy_power<=3|(holy_power=4&cooldown.crusader_strike.remains>=gcd*2&target.health.pct>35&buff.avenging_wrath.down)
+                                S.Cast(SB.s_Judgement, ret => U.isUnitValid(currentTarget, SB.s_Judgement) && (U.holyPower <= 3 | (U.holyPower == 4 && U.cd_crusaderStrike_remains >= 7000 && currentTarget.HealthPercent > 35 && !U.avengingWrath))),
                                 //actions.cleave+=/divine_storm,if=buff.divine_crusader.react&buff.final_verdict.up
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.divineCrusader && U.finalVerdict)),
                                 //actions.cleave+=/divine_storm,if=buff.divine_purpose.react&buff.final_verdict.up
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.divinePurpose && U.finalVerdict)),
                                 //actions.cleave+=/divine_storm,if=holy_power>=4&buff.final_verdict.up
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.holyPower >= 4 && U.finalVerdict)),
                                 //actions.cleave+=/final_verdict,if=buff.divine_purpose.react&buff.final_verdict.down
+                                S.Cast(SB.s_FinalVerdict, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.divinePurpose && !U.finalVerdict)),
                                 //actions.cleave+=/final_verdict,if=holy_power>=4&buff.final_verdict.down
+                                S.Cast(SB.s_FinalVerdict, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.holyPower >= 4 && !U.finalVerdict)),
                                 //actions.cleave+=/divine_storm,if=buff.divine_crusader.react&!talent.final_verdict.enabled
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && (U.divineCrusader && !TM.t_FinalVerdict)),
                                 //actions.cleave+=/divine_storm,if=holy_power>=4&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*5)&!talent.final_verdict.enabled
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && (U.holyPower >= 4 && (!TM.t_Seraphim || U.cd_seraphim_remains > 7000) && !TM.t_FinalVerdict)),
                                 //actions.cleave+=/exorcism,if=talent.seraphim.enabled
+                                S.Cast(SB.s_Exorcism, ret => U.isUnitValid(currentTarget, SB.s_Exorcism) && (TM.t_Seraphim)),
                                 //actions.cleave+=/exorcism,if=holy_power<=3|(holy_power=4&(cooldown.judgment.remains>=gcd*2&cooldown.crusader_strike.remains>=gcd*2&target.health.pct>35&buff.avenging_wrath.down))
+                                S.Cast(SB.s_Exorcism, ret => U.isUnitValid(currentTarget, SB.s_Exorcism) && (U.holyPower <= 3 || (U.holyPower == 4 && (U.cd_judgement_remains > 2500 && U.cd_crusaderStrike_remains > 2500 && currentTarget.HealthPercent > 35 && !U.avengingWrath)))),
                                 //actions.cleave+=/divine_storm,if=holy_power>=3&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*6)&!talent.final_verdict.enabled
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && (U.holyPower >= 3 && (!TM.t_Seraphim || U.cd_seraphim_remains > 8000) && !TM.t_FinalVerdict)),
                                 //actions.cleave+=/divine_storm,if=holy_power>=3&buff.final_verdict.up
+                                S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.holyPower >= 3 && U.finalVerdict)),
                                 //actions.cleave+=/final_verdict,if=holy_power>=3&buff.final_verdict.down
+                                S.Cast(SB.s_FinalVerdict, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.holyPower >= 3 && !U.finalVerdict))
 
                             )),
                             // SINGLE/DOUBLE TARGET //
@@ -344,7 +379,7 @@ namespace Paladin_Retribution.Rotation
                             //actions.single+=/final_verdict,if=buff.divine_purpose.react&buff.divine_purpose.remains<3
                             S.Cast(SB.s_FinalVerdict, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && TM.t_FinalVerdict && (U.divinePurpose && U.divinePurpose_remains < 3000)),
                             //actions.single+=/crusader_strike,if=t18_class_trinket=1&buff.focus_of_vengeance.remains<gcd.max*2
-                            S.Cast(SB.s_CrusaderStrike, ret => U.isUnitValid(currentTarget, SB.s_CrusaderStrike) && (t18_trinket && U.focusOfVengeance_remains < 2500)),
+                            S.Cast(SB.s_CrusaderStrike, ret => U.isUnitValid(currentTarget, SB.s_CrusaderStrike) && (t18_trinket && U.focusOfVengeance_remains < 3000)),
                             //actions.single+=/hammer_of_wrath
                             S.Cast(SB.s_HammerOfWrath, ret => U.isUnitValid(currentTarget, SB.s_HammerOfWrath)),
                             //actions.single+=/exorcism,if=buff.blazing_contempt.up&holy_power<=2&buff.holy_avenger.down
@@ -358,11 +393,11 @@ namespace Paladin_Retribution.Rotation
                             //actions.single+=/divine_storm,if=buff.divine_crusader.react&spell_targets.divine_storm=2&(buff.avenging_wrath.up|target.health.pct<35)&!talent.final_verdict.enabled
                             S.Cast(SB.s_DivineStorm, ret => U.isUnitValid(currentTarget, SB.s_FinalVerdict) && (U.divineCrusader && enemies == 2 && (U.avengingWrath || currentTarget.HealthPercent < 35) && !TM.t_FinalVerdict)),
                             //actions.single+=/templars_verdict,if=holy_power=5&(buff.avenging_wrath.up|target.health.pct<35)&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*3)
-                            S.Cast(SB.s_TemplarsVerdict, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && !TM.t_FinalVerdict && (U.holyPower == 5 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains < 3000))),
+                            S.Cast(SB.s_TemplarsVerdict, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && !TM.t_FinalVerdict && (U.holyPower == 5 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains > 3000))),
                             //actions.single+=/templars_verdict,if=holy_power=4&(buff.avenging_wrath.up|target.health.pct<35)&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*4)
-                            S.Cast(SB.s_TemplarsVerdict, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && !TM.t_FinalVerdict && (U.holyPower == 4 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains < 4000))),
+                            S.Cast(SB.s_TemplarsVerdict, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && !TM.t_FinalVerdict && (U.holyPower == 4 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains > 4000))),
                             //actions.single+=/templars_verdict,if=holy_power=3&(buff.avenging_wrath.up|target.health.pct<35)&(!talent.seraphim.enabled|cooldown.seraphim.remains>gcd*5)
-                            S.Cast(SB.s_TemplarsVerdict, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && !TM.t_FinalVerdict && (U.holyPower == 3 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains < 5000))),
+                            S.Cast(SB.s_TemplarsVerdict, ret => U.isUnitValid(currentTarget, SB.s_TemplarsVerdict) && !TM.t_FinalVerdict && (U.holyPower == 3 && (U.avengingWrath || currentTarget.HealthPercent < 35) && (!TM.t_Seraphim || U.cd_seraphim_remains > 5000))),
                             //actions.single+=/judgment,if=talent.empowered_seals.enabled&seal.truth&buff.maraads_truth.remains<cooldown.judgment.duration*1.5
                             S.Cast(SB.s_Judgement, ret => U.isUnitValid(currentTarget, SB.s_Judgement) && (TM.t_EmpoweredSeals && U.sealOfTruth && U.maraadsTruth_remains < 7500)),
                             //actions.single+=/judgment,if=talent.empowered_seals.enabled&seal.righteousness&buff.liadrins_righteousness.remains<cooldown.judgment.duration*1.5
@@ -419,40 +454,11 @@ namespace Paladin_Retribution.Rotation
         }  
         #endregion
 
-        public static int numEnemies()
-        {
-            IEnumerable<WoWUnit> enemiesNearby = ObjectManager.GetObjectsOfType<WoWUnit>(true, false).Where(
-                                u =>
-                                    UnitShouldActuallyBeAttacked(u) &&
-                                    u.InLineOfSpellSight &&
-                                    u.InLineOfSight &&
-                                    u.Distance <= 10).OrderBy(u => u.DistanceSqr).ToList();
-            return enemiesNearby.Count();
-        }
-
-        public static Boolean UnitShouldActuallyBeAttacked(WoWUnit unit)
-        {
-            return
-                unit.IsValid &&
-                unit.IsAlive &&
-                unit.IsFriendly &&
-                !unit.IsPet &&
-                !unit.CreatureType.Equals(WoWCreatureType.BattlePet) &&
-                !unit.CreatureType.Equals(WoWCreatureType.Critter) &&
-                !unit.CreatureType.Equals(WoWCreatureType.NonCombatPet) &&
-                !unit.CreatureType.Equals(WoWCreatureType.Totem)
-                ;
-        }
-
-        //from Singular
         private static Action ActionAoeCount()
         {
             return new Action(ret =>
             {
-                myEnemies = numEnemies();
-                //enemies = nearbyTargets(Me.Location, 8).Count();
                 enemies = U.activeEnemies(Me.Location, 8f).Count();
-                //Logging.Write(Colors.Green, "Rot.enemies: " + enemies);
                 return RunStatus.Failure;
             });
         }

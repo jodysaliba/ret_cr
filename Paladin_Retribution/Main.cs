@@ -30,7 +30,7 @@ namespace Paladin_Retribution
 {
     public class Main : CombatRoutine
     {
-        private static readonly Version version = new Version(1, 1, 1);
+        private static readonly Version version = new Version(1, 1, 2);
         public override string Name { get { return "Shineey Paladin v" + version; } }
         public override WoWClass Class { get { return WoWClass.Paladin; } }
         private static LocalPlayer Me { get { return StyxWoW.Me; } }
@@ -58,6 +58,10 @@ namespace Paladin_Retribution
                 HKM.registerHotKeys();
                 TM.registerTalents();
 
+                //Logging.Write(Colors.White, "[Shineey] num_t17: " + Rot.t17_equipped);
+                //Logging.Write(Colors.White, "[Shineey] num_t18: " + Rot.t18_equipped);
+                //Logging.Write(Colors.White, "[Shineey] t_Seraphim: " + TM.t_Seraphim);
+                //Logging.Write(Colors.White, "[Shineey] t_FinalVerdict: " + TM.t_FinalVerdict);
             }
             public override bool WantButton { get { return true; } }
             public override void OnButtonPress() { Logging.Write(Colors.OrangeRed, "Coming soon!"); }
@@ -65,15 +69,18 @@ namespace Paladin_Retribution
             #endregion
 
             #region [Method] - Pulse
+            static int pulsePhase = 0;
             public override void Pulse()
             {
+                pulsePhase++;
                 if (!StyxWoW.IsInWorld || Me == null || !Me.IsValid || !Me.IsAlive)
                     return;
                 if (!Me.Combat || Me.Mounted)
                     return;
-                U.enemyAnnex(8f);
-                //U.UpdateEnemyList(8f);
-                U.Cache();
+                if (pulsePhase % 2 == 0)
+                    U.enemyAnnex(8f);
+                else
+                    U.Cache();
                 //Logging.Write(Colors.OrangeRed, "num_t17: " + Rot.num_t17);
                 //Logging.Write(Colors.OrangeRed, "num_t18: " + Rot.num_t18);
                 //Logging.Write(Colors.OrangeRed, "Rot.enemies: " + Rot.enemies);

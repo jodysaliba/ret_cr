@@ -19,6 +19,7 @@ namespace Paladin_Retribution.Core.Managers
         public static bool cooldownsOn { get; set; }
         public static bool manualOn { get; set; }
         public static bool keysRegistered { get; set; }
+        public static bool righteousness { get; set; }
 
         #region [Method] - Hotkey Registration
         // AOE = X
@@ -28,10 +29,9 @@ namespace Paladin_Retribution.Core.Managers
         {
             if (keysRegistered)
                 return;
-            HotkeysManager.Register("aoeOn", Keys.X, ModifierKeys.NoRepeat, ret =>
+            HotkeysManager.Register("aoeOn", Keys.Insert, ModifierKeys.NoRepeat, ret =>
             {
                 aoeOn = !aoeOn;
-                //Lua.DoString(aoeOn ? @"print('AoE Mode: \124cFF15E61C Enabled!')" : @"print('AoE Mode: \124cFFE61515 Disabled!')");
                 if (!aoeOn)
                 {
                     //LuaDoString("print('Execution Paused!')");
@@ -40,9 +40,11 @@ namespace Paladin_Retribution.Core.Managers
                         return string.Format("AOE Disabled!");
                     },
                     TimeSpan.FromSeconds(2),
-                    System.Windows.Media.Colors.Lime,
-                    System.Windows.Media.Colors.Blue,
-                    new System.Windows.Media.FontFamily("Consolas"));
+                    System.Windows.Media.Colors.OrangeRed,
+                    System.Windows.Media.Colors.SeaShell,
+                    new System.Windows.Media.FontFamily("Consolas"),
+                    System.Windows.FontWeights.Normal,
+                    32);
                 }
                 else
                 {
@@ -52,15 +54,16 @@ namespace Paladin_Retribution.Core.Managers
                         return string.Format("AOE Enabled!");
                     },
                     TimeSpan.FromSeconds(2),
-                    System.Windows.Media.Colors.Lime,
-                    System.Windows.Media.Colors.Blue,
-                    new System.Windows.Media.FontFamily("Consolas"));
+                    System.Windows.Media.Colors.DarkGreen,
+                    System.Windows.Media.Colors.SeaShell,
+                    new System.Windows.Media.FontFamily("Consolas"),
+                    System.Windows.FontWeights.Normal,
+                    32);
                 }
             });
-            HotkeysManager.Register("cooldownsOn", Keys.Insert, ModifierKeys.NoRepeat, ret =>
+            HotkeysManager.Register("cooldownsOn", Keys.X, ModifierKeys.NoRepeat, ret =>
             {
                 cooldownsOn = !cooldownsOn;
-                //Lua.DoString(cooldownsOn ? @"print('Cooldowns: \124cFF15E61C Enabled!')" : @"print('Cooldowns: \124cFFE61515 Disabled!')");
                 if (!cooldownsOn)
                 {
                     StyxWoW.Overlay.AddToast(() =>
@@ -68,9 +71,11 @@ namespace Paladin_Retribution.Core.Managers
                         return string.Format("CDs Disabled!");
                     },
                     TimeSpan.FromSeconds(2),
-                    System.Windows.Media.Colors.Lime,
-                    System.Windows.Media.Colors.Blue,
-                    new System.Windows.Media.FontFamily("Consolas"));
+                    System.Windows.Media.Colors.OrangeRed,
+                    System.Windows.Media.Colors.SeaShell,
+                    new System.Windows.Media.FontFamily("Consolas"),
+                    System.Windows.FontWeights.Normal,
+                    32);
                 }
                 else
                 {
@@ -79,15 +84,16 @@ namespace Paladin_Retribution.Core.Managers
                         return string.Format("CDs Enabled!");
                     },
                     TimeSpan.FromSeconds(2),
-                    System.Windows.Media.Colors.Lime,
-                    System.Windows.Media.Colors.Blue,
-                    new System.Windows.Media.FontFamily("Consolas"));
+                    System.Windows.Media.Colors.DarkGreen,
+                    System.Windows.Media.Colors.SeaShell,
+                    new System.Windows.Media.FontFamily("Consolas"),
+                    System.Windows.FontWeights.Normal,
+                    32);
                 }
             });
             HotkeysManager.Register("manualOn", Keys.Pause, ModifierKeys.NoRepeat, ret =>
             {
                 manualOn = !manualOn;
-                //Lua.DoString(manualOn ? @"print('Manual Mode: \124cFF15E61C Enabled!')" : @"print('Manual Mode: \124cFFE61515 Disabled!')");
                 if (manualOn)
                 {
                     //LuaDoString("print('Execution Paused!')");
@@ -96,9 +102,11 @@ namespace Paladin_Retribution.Core.Managers
                         return string.Format("Execution Paused!");
                     },
                     TimeSpan.FromSeconds(2),
-                    System.Windows.Media.Colors.Lime,
-                    System.Windows.Media.Colors.Blue,
-                    new System.Windows.Media.FontFamily("Consolas"));
+                    System.Windows.Media.Colors.OrangeRed,
+                    System.Windows.Media.Colors.SeaShell,
+                    new System.Windows.Media.FontFamily("Consolas"),
+                    System.Windows.FontWeights.Normal,
+                    32);
 
                     // Make the bot use less resources while paused.
                     TreeRoot.TicksPerSecond = 5;
@@ -111,16 +119,49 @@ namespace Paladin_Retribution.Core.Managers
                         return string.Format("Execution Resumed!");
                     },
                     TimeSpan.FromSeconds(2),
-                    System.Windows.Media.Colors.Lime,
-                    System.Windows.Media.Colors.Blue,
-                    new System.Windows.Media.FontFamily("Consolas"));
+                    System.Windows.Media.Colors.DarkGreen,
+                    System.Windows.Media.Colors.SeaShell,
+                    new System.Windows.Media.FontFamily("Consolas"),
+                    System.Windows.FontWeights.Normal,
+                    32);
 
                     // Kick it back into overdrive!
                     TreeRoot.TicksPerSecond = 8;
                 }
             });
+            HotkeysManager.Register("righteousness", Keys.C, ModifierKeys.Shift, ret =>
+            {
+                righteousness = !righteousness;
+                if (!righteousness)
+                {
+                    //LuaDoString("print('Execution Paused!')");
+                    StyxWoW.Overlay.AddToast(() =>
+                    {
+                        return string.Format("Seal of Truth!");
+                    },
+                    TimeSpan.FromSeconds(2),
+                    System.Windows.Media.Colors.DarkOrange,
+                    System.Windows.Media.Colors.SeaShell,
+                    new System.Windows.Media.FontFamily("Consolas"),
+                    System.Windows.FontWeights.Normal,
+                    32);
+                }
+                else
+                {
+                    //LuaDoString("print('Execution Resumed!')");
+                    StyxWoW.Overlay.AddToast(() =>
+                    {
+                        return string.Format("Seal of Righteousness!");
+                    },
+                    TimeSpan.FromSeconds(2),
+                    System.Windows.Media.Colors.Navy,
+                    System.Windows.Media.Colors.SeaShell,
+                    new System.Windows.Media.FontFamily("Consolas"),
+                    System.Windows.FontWeights.Normal,
+                    32);
+                }
+            });
             keysRegistered = true;
-            //Lua.DoString(@"print('Hotkeys: \124cFF15E61C Registered!')");
             Logging.Write(Colors.Aqua, "[Shineey] Hotkeys: Registered!");
         }  
         #endregion
@@ -137,7 +178,6 @@ namespace Paladin_Retribution.Core.Managers
             cooldownsOn = false;
             manualOn = false;
             keysRegistered = false;
-            //Lua.DoString(@"print('Hotkeys: \124cFFE61515 Removed!')");
             Logging.Write(Colors.OrangeRed, "[Shineey] Hotkeys: Removed!");
         }  
         #endregion
