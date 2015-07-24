@@ -30,7 +30,7 @@ namespace Paladin_Retribution
 {
     public class Main : CombatRoutine
     {
-        private static readonly Version version = new Version(1, 1, 2);
+        private static readonly Version version = new Version(1, 1, 3);
         public override string Name { get { return "Shineey Paladin v" + version; } }
         public override WoWClass Class { get { return WoWClass.Paladin; } }
         private static LocalPlayer Me { get { return StyxWoW.Me; } }

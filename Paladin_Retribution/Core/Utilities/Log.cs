@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using Styx.Common;
 
+using Rot = Paladin_Retribution.Rotation.Rotation;
+
 namespace Paladin_Retribution.Core.Utilities
 {
     class Log
@@ -17,6 +19,7 @@ namespace Paladin_Retribution.Core.Utilities
         {
             if (Message == lastCombatMSG)
                 return;
+            //Logging.Write(Colors.OrangeRed, "[Shineey] {0} - Enemies: {1}", String.Format(Message, args), Rot.enemies);
             Logging.Write(Colors.OrangeRed, "[Shineey] {0}", String.Format(Message, args));
             lastCombatMSG = Message;
         }
