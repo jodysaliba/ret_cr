@@ -18,6 +18,7 @@ using Styx.TreeSharp;
 using Paladin_Retribution.Rotation;
 
 #region [Method] - Class Redundancy
+using Paladin_Retribution.Interface.GUI;
 using HKM = Paladin_Retribution.Core.Managers.Hotkey_Manager;
 using TM = Paladin_Retribution.Core.Managers.Talent_Manager;
 using R = Paladin_Retribution.Rotation.Rotation;
@@ -64,7 +65,19 @@ namespace Paladin_Retribution
                 //Logging.Write(Colors.White, "[Shineey] t_FinalVerdict: " + TM.t_FinalVerdict);
             }
             public override bool WantButton { get { return true; } }
-            public override void OnButtonPress() { Logging.Write(Colors.OrangeRed, "Coming soon!"); }
+
+            private ConfigForm _configForm;
+            public override void OnButtonPress() 
+            {
+                Logging.Write(Colors.OrangeRed, "Coming soon!");
+                if (_configForm == null || _configForm.IsDisposed || _configForm.Disposing)
+                {
+                    _configForm = new ConfigForm();
+                }
+
+                _configForm.Show();
+            }
+
             public override void ShutDown() { HKM.removeHotkeys(); }
             #endregion
 
