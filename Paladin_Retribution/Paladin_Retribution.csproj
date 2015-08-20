@@ -58,6 +58,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -71,6 +72,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Managers\Inventory.cs" />
+    <Compile Include="Interface\GUI\ConfigForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Interface\GUI\ConfigForm.Designer.cs">
+      <DependentUpon>ConfigForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Interface\Settings\Hotkey Settings.cs" />
+    <Compile Include="Interface\Settings\Shineey Settings.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Core\Spell.cs" />
     <Compile Include="Core\Helpers\Spell Book.cs" />
@@ -83,8 +92,9 @@
     <Compile Include="Rotation\Rotation.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Interface\GUI\" />
-    <Folder Include="Interface\Settings\" />
+    <EmbeddedResource Include="Interface\GUI\ConfigForm.resx">
+      <DependentUpon>ConfigForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

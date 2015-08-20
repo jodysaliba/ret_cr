@@ -38,7 +38,6 @@ namespace Paladin_Retribution.Rotation
         public static bool t18_equipped = !t17_equipped; // if 2/4pc t18 or no set bonuses
         public static bool t18_trinket = Inventory.HasItemEquipped(124518); // Paladin trinket off Archimonde (Libram of Vindication)
         
-        public static int myEnemies = 0;
         public static int enemies = 0;
         public static int activeEn = -1;
         
@@ -100,7 +99,7 @@ namespace Paladin_Retribution.Rotation
                         new PrioritySelector(
                             // NO TIER --- TIER 17
 
-                            ActionAoeCount(),
+                            //ActionAoeCount(),
 
                             // Autoattack
                             new Action(ret =>
@@ -284,7 +283,7 @@ namespace Paladin_Retribution.Rotation
                         new PrioritySelector(
                             // TIER 18
 
-                            ActionAoeCount(),
+                            //ActionAoeCount(),
 
                             // Autoattack
                             new Action(ret =>

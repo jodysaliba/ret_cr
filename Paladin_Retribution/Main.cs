@@ -32,7 +32,7 @@ namespace Paladin_Retribution
 {
     public class Main : CombatRoutine
     {
-        public static readonly Version version = new Version(1, 2, 1);
+        public static readonly Version version = new Version(1, 2, 2);
         public override string Name { get { return "Shineey Paladin v" + version; } }
         public override WoWClass Class { get { return WoWClass.Paladin; } }
         private static LocalPlayer Me { get { return StyxWoW.Me; } }
@@ -98,10 +98,15 @@ namespace Paladin_Retribution
                 return;
             if (!Me.Combat || Me.Mounted)
                 return;
-            if (pulsePhase % 2 == 0)
+            if (pulsePhase == 1)
                 U.enemyAnnex(8f);
-            else
+            else if (pulsePhase == 2)
                 U.Cache();
+            else
+            {
+                Rot.enemies = U.activeEnemies(Me.Location, 10f).Count();
+                pulsePhase = 0;
+            }
             //Logging.Write(Colors.OrangeRed, "num_t17: " + Rot.num_t17);
             //Logging.Write(Colors.OrangeRed, "num_t18: " + Rot.num_t18);
             //Logging.Write(Colors.OrangeRed, "Rot.enemies: " + Rot.enemies);
